@@ -1,2 +1,7 @@
 output
+callgrind.out*
+perf*
+image.ppm
+output.svg
+output
 raytrace.png

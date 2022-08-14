@@ -23,15 +23,15 @@ colour ray_colour(ray* r, hittable_list* world, int depth) {
         switch (rec.mat_ptr->mat_type) {
             case 0:
                 return (colour){0,0,0};
-            case 1:
+            case LAMBERTIAN:
                 if (lambertian_scatter(rec.mat_ptr, r, &rec, &attenuation, &scattered)) {
                     return vec3_mul_v_r(attenuation, ray_colour(&scattered, world, depth-1));
                 }
-            case 2:
+            case METAL:
                 if (metal_scatter(rec.mat_ptr, r, &rec, &attenuation, &scattered)) {
                     return vec3_mul_v_r(attenuation, ray_colour(&scattered, world, depth-1));
                 }
-            case 3:
+            case DIELECTRIC:
                 if (dielectric_scatter(rec.mat_ptr, r, &rec, &attenuation, &scattered)) {
                     return vec3_mul_v_r(attenuation, ray_colour(&scattered, world, depth-1));
                 }
@@ -69,7 +69,7 @@ hittable_list* random_scene() {
             sphere* sphere_object = (sphere*)malloc(sizeof(sphere));
             if (vec3_length(vec3_sub_v_r(center, (vec3) {4, 0.2, 0})) > 0.9) {
                 if (choose_mat < 0.8) {
-                    // diffuse
+                    // diffuse (lambertian)
                     vec3 albedo = vec3_mul_v_r(vec3_random(), vec3_random());
                     *sphere_material = (material){LAMBERTIAN, albedo};
                     *sphere_object = (sphere){center, 0.2, sphere_material};
@@ -82,7 +82,7 @@ hittable_list* random_scene() {
                     *sphere_object = (sphere){center, 0.2, sphere_material};
                     world = hl_add(world, sphere_object);
                 } else {
-                    // glass
+                    // glass (dielectric)
                     *sphere_material = (material){DIELECTRIC, {0,0,0}, 0, 1.5};
                     *sphere_object = (sphere){center, 0.2, sphere_material};
                     world = hl_add(world, sphere_object);
@@ -95,7 +95,6 @@ hittable_list* random_scene() {
     sphere* sphere1 = (sphere*)malloc(sizeof(sphere));
     *material1 = (material){DIELECTRIC, {0,0,0}, 0, 1.5};
     *sphere1 = (sphere){(vec3){0,1,0}, 1.0, material1};
-
     world = hl_add(world, sphere1);
 
     material* material2 = (material*)malloc(sizeof(material));

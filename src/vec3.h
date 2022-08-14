@@ -41,7 +41,7 @@ double vec3_square_length(vec3 vector) {
     return vector.x*vector.x + vector.y*vector.y + vector.z*vector.z;
 }
 
-double vec3_length(vec3 vector) { // TODO: Newton's method?
+double vec3_length(vec3 vector) {
     return sqrt(vec3_square_length(vector));
 }
 
