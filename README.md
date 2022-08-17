@@ -1,12 +1,14 @@
-# Raytracer
-This is a raytracer I built in C.
-All the math librarys are hand-written and thus not very performant.
+# Ray tracer
+This is a ray tracer I built in C.
+All the math libraries are handwritten.
+Additionally, there are zero post-processing effects added, meaning every effect you see in the image below is 100% rendered i.e. depth of field, aperture size, anti-aliasing, etc.
+
+It should also be noted this implementation uses barely any imports. I only import math for trigonometric functions and some definitions, stdio for printing, and stdlib for malloc.
 
 ## Examples
 
-This render took about an hour to render on a Ryzen 5 1600.
-The raytracer is single-threaded and not GPU accelerated (yet). So it's very slow.
-Additionally, there are zero post-processing effects added, meaning every effect you see in the image below is 100% rendered.
+This render took about an hour on a Ryzen 5 1600.
+The ray tracer is single-threaded and not GPU accelerated (yet).
 
 ![Raytraced scene](docs/raytrace.png)
 

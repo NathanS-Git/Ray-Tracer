@@ -1,17 +1,6 @@
-#ifndef VEC3_H
-#define VEC3_H
-
 #include <math.h>
-#include <stdio.h>
 #include "rtweekend.h"
-
-#define VEC3_ZERO_INIT {0.0, 0.0, 0.0}
-
-typedef struct {
-    double x;
-    double y;
-    double z;
-} vec3, colour;
+#include "vec3.h"
 
 void vec3_negate(vec3* vector) {
     vector->x *= -1;
@@ -71,6 +60,7 @@ double vec3_dot(vec3* vector, vec3* input) {
     return vector->x*input->x + vector->y*input->y + vector->z*input->z;
 }
 
+// All functions with an _r appended return a value compared to their non _r counterparts
 vec3 vec3_negate_r(vec3 vector) {
     vec3 output = vector;
     vec3_negate(&output);
@@ -178,5 +168,3 @@ vec3 vec3_refract(vec3* uv, vec3* n, double etai_over_etat) {
     vec3 r_out_parallel = vec3_mul_s_r(*n ,-sqrt(fabs(1.0 - vec3_square_length(r_out_perp))));
     return vec3_add_v_r(r_out_perp, r_out_parallel);
 }
-
-#endif

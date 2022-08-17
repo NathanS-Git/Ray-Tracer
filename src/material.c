@@ -1,22 +1,6 @@
-#ifndef MATERIAL_H
-#define MATERIAL_H
-
+#include <math.h>
 #include "rtweekend.h"
-#include "ray.h"
-#include "hittable.h"
-
-#define LAMBERTIAN 1
-#define METAL 2
-#define DIELECTRIC 3
-
-#define MATERIAL_ZERO_INIT {0, {0, 0, 0}, 0, 0}
-
-typedef struct material {
-    int mat_type;
-    colour a;
-    double f;
-    double ir;
-} material;
+#include "material.h"
 
 bool lambertian_scatter(material* lambertian, ray* r_in, hit_record* rec, colour* attenuation, ray* scattered) {
     vec3 scatter_direction = vec3_add_v_r(rec->normal, vec3_random_unit_vector());
@@ -64,7 +48,3 @@ bool dielectric_scatter(material* dielectric, ray* r_in, hit_record* rec, colour
     *scattered = (ray) {rec->p, direction};
     return true;
 }
-
-
-
-#endif

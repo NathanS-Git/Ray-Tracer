@@ -1,10 +1,8 @@
-#ifndef RTWEEKEND_H
-#define RTWEEKEND_H
-
 #include <math.h>
 #include <stdlib.h>
+#include "rtweekend.h"
 
-inline double degrees_to_radians(double degrees) {
+double degrees_to_radians(double degrees) {
     return degrees * M_PI / 180.0;
 }
 
@@ -21,8 +19,3 @@ double clamp(double x, double min, double max) {
     if (x > max) return max;
     return x;
 }
-
-#include "ray.h"
-#include "vec3.h"
-
-#endif

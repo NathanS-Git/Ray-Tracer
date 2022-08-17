@@ -1,13 +1,17 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include "camera.h"
+#include <stdlib.h>
+#include <math.h>
+
 #include "vec3.h" 
 #include "colour.h"
-#include "material.h"
-#include "hittable_list.h"
 #include "ray.h"
+#include "hittable.h"
+#include "material.h"
 #include "sphere.h"
+#include "hittable_list.h"
+#include "camera.h"
+#include "rtweekend.h"
 
+// Obtain the colour of the ray (i.e. what it ends up hitting)
 colour ray_colour(ray* r, hittable_list* world, int depth) {
     hit_record rec = (hit_record)HR_ZERO_INIT;
     rec.mat_ptr = &(material)MATERIAL_ZERO_INIT;
@@ -17,12 +21,13 @@ colour ray_colour(ray* r, hittable_list* world, int depth) {
         return (vec3) {0,0,0};
     }
 
+    // Check if the ray hits any object
     if (hl_hit(world, r, 0.001, INFINITY, &rec)) {
         ray scattered;
         colour attenuation;
+
+        // If we hit something, run the appropriate scatter function
         switch (rec.mat_ptr->mat_type) {
-            case 0:
-                return (colour){0,0,0};
             case LAMBERTIAN:
                 if (lambertian_scatter(rec.mat_ptr, r, &rec, &attenuation, &scattered)) {
                     return vec3_mul_v_r(attenuation, ray_colour(&scattered, world, depth-1));
@@ -39,27 +44,30 @@ colour ray_colour(ray* r, hittable_list* world, int depth) {
                 return (colour){0,0,0};
                 
         }
-        //vec3 target = vec3_add_v_r(vec3_add_v_r(rec.normal, vec3_random_unit_vector()), rec.p);
         vec3 target = vec3_add_v_r(rec.p, vec3_random_hemisphere(&rec.normal));
         ray input = {rec.p,vec3_sub_v_r(target, rec.p)};
         return vec3_mul_s_r( ray_colour(&input, world, depth-1), 0.5);
     }
     vec3 unit_direction = vec3_unit(r->direction);
     double t = 0.5*(unit_direction.y + 1.0);
+    // output = <1,1,1>*(1.0-t) + <0.5,0.7,1.0>*t
     vec3 output = vec3_add_v_r(vec3_mul_s_r((vec3) {1.0, 1.0, 1.0}, (1.0-t)), vec3_mul_s_r((vec3){0.5, 0.7,1.0}, t));
     
     return output;
 }
 
+// Create all the sphere objects for the render
 hittable_list* random_scene() {
     hittable_list* world = (hittable_list*)malloc(sizeof(hittable_list));
 
+    // Ground
     material* ground_material = (material*)malloc(sizeof(material));
     *ground_material = (material){LAMBERTIAN, {0.5, 0.5, 0.5}};
     sphere* ground = (sphere*)malloc(sizeof(sphere));
     *ground = (sphere){{0, -1000, 0}, 1000, ground_material};
     world->object = ground;
 
+    // Produce a scene of small spheres of varying material
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
             double choose_mat = random_double();
@@ -91,18 +99,22 @@ hittable_list* random_scene() {
         }
     }  
 
+
+    // Large glass sphere
     material* material1 = (material*)malloc(sizeof(material));
     sphere* sphere1 = (sphere*)malloc(sizeof(sphere));
     *material1 = (material){DIELECTRIC, {0,0,0}, 0, 1.5};
     *sphere1 = (sphere){(vec3){0,1,0}, 1.0, material1};
     world = hl_add(world, sphere1);
 
+    // Large smooth sphere
     material* material2 = (material*)malloc(sizeof(material));
     sphere* sphere2 = (sphere*)malloc(sizeof(sphere));
     *material2 = (material){LAMBERTIAN, {0.4,0.2,0.1}};
     *sphere2 = (sphere){(vec3){-4,1,0}, 1.0, material2};
     world = hl_add(world, sphere2);
 
+    // Large reflective metal sphere
     material* material3 = (material*)malloc(sizeof(material));
     sphere* sphere3 = (sphere*)malloc(sizeof(sphere));
     *material3 = (material){METAL, {0.7,0.6,0.5}, 0.0};
@@ -113,27 +125,15 @@ hittable_list* random_scene() {
 }
 
 int main() {
-    
+
     // Image
     const double aspect_ratio = 3.0 / 2.0;
     const int image_width = 1200;
     const int image_height = image_width / aspect_ratio;
-    const int samples_per_pixel = 500;
+    const int samples_per_pixel = 1;
     const int max_depth = 50;
 
     // World
-    /*
-    hittable_list* world = &(hittable_list)HL_ZERO_INIT;
-    material material_ground = {LAMBERTIAN, {0.8, 0.8, 0.0}};
-    material material_center = {LAMBERTIAN, {0.1, 0.2, 0.5}};
-    material material_left = {DIELECTRIC, {0.0, 0.0, 0.0}, 0, 1.5};
-    material material_right = {METAL, {0.8, 0.6, 0.2}, 0.0};
-
-    world->object = &(sphere){{0,-100.5,-1.0}, 100.0, &material_ground};
-    world = hl_add(world, &(sphere){{0,0,-1}, 0.5, &material_center});
-    world = hl_add(world, &(sphere){{-1,0,-1}, 0.5, &material_left});
-    world = hl_add(world, &(sphere){{-1,0,-1}, -0.45, &material_left});
-    world = hl_add(world, &(sphere){{1,0,-1}, 0.5, &material_right});*/
     hittable_list* world = random_scene();
 
     // Camera
@@ -150,12 +150,13 @@ int main() {
     for (int j = image_height-1; j >= 0; --j) {
         fprintf(stderr, "\rScanlines remaining: %3d", j);
         for (int i = 0; i < image_width; ++i) {
-            colour pixel_colour = (vec3) {0,0,0};
+            colour pixel_colour = (colour) {0,0,0};
             for (int s = 0; s < samples_per_pixel; ++s) {
+                // Sample the ray in a slightly random direction each time
                 double rand1 = random_double();
                 double rand2 = random_double();
-                double u =  ((double)i+rand1) / (image_width-1);
-                double v =  ((double)j+rand2) / (image_height-1);
+                double u =  (i+rand1) / (image_width-1);
+                double v =  (j+rand2) / (image_height-1);
                 ray r = camera_get_ray(&cam, u, v);
                 pixel_colour = vec3_add_v_r(pixel_colour, ray_colour(&r, world, max_depth));
             }
