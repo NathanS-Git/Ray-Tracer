@@ -1,5 +1,5 @@
 #include <math.h>
-#include "rtweekend.h"
+#include "utils.h"
 #include "material.h"
 
 bool lambertian_scatter(material* lambertian, ray* r_in, hit_record* rec, colour* attenuation, ray* scattered) {

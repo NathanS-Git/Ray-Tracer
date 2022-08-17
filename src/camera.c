@@ -1,5 +1,5 @@
 #include <math.h>
-#include "rtweekend.h"
+#include "utils.h"
 #include "camera.h"
 
 camera cam_init(vec3 lookfrom, vec3 lookat, vec3 vup, double vfov, double aspect_ratio, double aperture, double focus_dist) {

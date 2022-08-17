@@ -1,5 +1,5 @@
 #include <math.h>
-#include "rtweekend.h"
+#include "utils.h"
 #include "vec3.h"
 
 void vec3_negate(vec3* vector) {

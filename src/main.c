@@ -9,7 +9,7 @@
 #include "sphere.h"
 #include "hittable_list.h"
 #include "camera.h"
-#include "rtweekend.h"
+#include "utils.h"
 
 // Obtain the colour of the ray (i.e. what it ends up hitting)
 colour ray_colour(ray* r, hittable_list* world, int depth) {
@@ -130,7 +130,7 @@ int main() {
     const double aspect_ratio = 3.0 / 2.0;
     const int image_width = 1200;
     const int image_height = image_width / aspect_ratio;
-    const int samples_per_pixel = 1;
+    const int samples_per_pixel = 500;
     const int max_depth = 50;
 
     // World

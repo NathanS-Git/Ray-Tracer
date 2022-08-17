@@ -1,6 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
-#include "rtweekend.h"
+#include "utils.h"
 
 double degrees_to_radians(double degrees) {
     return degrees * M_PI / 180.0;

@@ -1,5 +1,5 @@
-#ifndef RTWEEKEND_H
-#define RTWEEKEND_H
+#ifndef UTILS_H
+#define UTILS_H
 
 // Converts degrees to radians
 double degrees_to_radians(double degrees);

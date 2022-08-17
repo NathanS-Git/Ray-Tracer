@@ -1,5 +1,5 @@
 #include <math.h>
-#include "rtweekend.h"
+#include "utils.h"
 #include "colour.h"
 
 void colour_print(FILE* stream, colour pixel, int samples_per_pixel) {
