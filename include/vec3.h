@@ -14,7 +14,7 @@ typedef struct vec3_s {
 
 // Negates a given vector
 void vec3_negate(vec3* vector);
-// Add's the components of two vectors together. Result is stored in the first vector
+// Adds the components of two vectors together. Result is stored in the first vector
 void vec3_add_v(vec3* vector, vec3* input);
 // Multiply each component of a vector by a scalar
 void vec3_mul_s(vec3* vector, double scalar);
